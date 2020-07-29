@@ -1,0 +1,77 @@
+version: '3'
+services:
+  web:
+    restart: always
+    build: ./URLShortener
+    ports:
+      - "8000:8000"
+      - "5678:5678"
+    volumes:
+      - ./URLShortener:/usr/src/app
+      - web-static:/usr/src/app/static
+    env_file: .env
+    depends_on:
+      - db
+      - redis
+    networks:
+      inner_network:
+    command: /usr/local/bin/gunicorn URLShortener.wsgi:application -w 2 -b :8000 --reload
+  db:
+    restart: always
+    image: postgres:12.3
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data/
+    env_file: .env
+    networks:
+      inner_network:
+  redis:
+    restart: always
+    image: redis:6.0
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/var/lib/redis/data
+    networks:
+      inner_network:
+  rabbitmq:
+    image: rabbitmq:3.7.23-management-alpine
+    env_file: .env
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    networks:
+      inner_network:
+  celery:
+    build: ./URLShortener
+    env_file: .env
+    volumes:
+      - celery-data:/var/lib/celery/data
+    depends_on:
+      - web
+      - rabbitmq
+    command: celery -A URLShortener worker -l info
+    networks:
+      inner_network:
+  celery-beat:
+    build: ./URLShortener
+    env_file: .env
+    volumes:
+      - celery-beat-data:/var/lib/celery-beat/data
+    depends_on:
+      - celery
+    command: celery -A URLShortener beat -l info
+    networks:
+      inner_network:
+volumes:
+  web-static:
+  db-data:
+  redis-data:
+  celery-data:
+  celery-beat-data:
+networks:
+  inner_network:
+
+
+
