@@ -16,14 +16,12 @@ Including another URLconf
 from django.conf import settings
 from django.contrib import admin
 from django.conf.urls.static import static
-from django.urls import path, re_path
-from django.views.generic.base import TemplateView
+from django.urls import include, path, re_path
 
 from shortener import views
 
 urlpatterns = static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + [
-    path('', TemplateView.as_view(template_name='index.html'), name='home'),
     path('admin/', admin.site.urls),
-    path('shorten', views.shorten_url, name='shorten-view'),
-    re_path(r'(?P<hash>[a-zA-Z0-9]+)/?', views.redirect_view),
+    path('api/', include('shortener.urls')),
+    re_path(r'r/(?P<hash>[a-zA-Z0-9]+)/?', views.redirect_view),
 ]

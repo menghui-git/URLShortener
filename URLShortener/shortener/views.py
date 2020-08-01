@@ -34,7 +34,8 @@ def shorten_url(request):
 
     hash = URL.objects.save_url(url)
     domain = request.META['HTTP_HOST']
-    shorten_url = "{}/{}".format(domain, hash)
+    scheme = request.is_secure() and "https" or "http"
+    shorten_url = f"{scheme}://{domain}/r/{hash}"
 
     return JsonResponse({'shorten_url': shorten_url, 'msg': None},
                         status=HTTPStatus.CREATED)

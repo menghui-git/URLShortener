@@ -17,7 +17,7 @@
 
         function shortenURL() {
           const xhr = new XMLHttpRequest();
-          const url = "http://localhost:8000/shorten";  // TODO: put in config
+          const url = "http://localhost/api/shorten";  // TODO: put in config
           xhr.open('POST', url, true);
           xhr.setRequestHeader("Content-type", "application/json");
 
