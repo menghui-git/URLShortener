@@ -3,4 +3,4 @@ FROM tutum/nginx
 RUN rm /etc/nginx/sites-enabled/default
 
 COPY sites-enabled/ /etc/nginx/sites-enabled
-COPY html/ /usr/share/nginx/html
+COPY static/ /usr/share/nginx/static
